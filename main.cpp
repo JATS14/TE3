@@ -134,10 +134,19 @@ class Colector{
     Lista lista_Datos;
 
     void guardar_dato (int pos_mem){
+        Nodo* temp = lista_Datos.Inicio;
+        int i = 0;
+        while (temp->siguiente != NULL){
+            if (temp->Dato == 0){
+                lista_Datos.cambiar_Dato(i,1);
+                return;
+            }
+            temp = temp->siguiente;
+            i++;
+        }
         lista_Datos.anadir_final(1, pos_mem);
     }
     void borrar_dato (int posicion){
-
         lista_Datos.cambiar_Dato(posicion, 0);
     }
 
