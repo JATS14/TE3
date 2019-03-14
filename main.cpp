@@ -15,24 +15,35 @@ Nodo::Nodo(int dato, int pos_mem) {
 
 }
 
+class NodoC {
+public: NodoC *siguiente;
+public: Nodo* nodo_memoria;
+public: int Dato;
+    NodoC (int dato, Nodo* nodo_mem);
+};
 
+NodoC::NodoC(int dato, Nodo* nodo_mem) {
+    Dato = dato;
+    nodo_memoria = nodo_mem;
+    siguiente = NULL;
+}
 
 class Lista {
-public: Nodo *Inicio = NULL;
+public: NodoC *Inicio = NULL;
 
-    void anadir_final (int dato, int pos_memoria){
+    void anadir_final (int dato, Nodo* Nodo_memoria){
         if(Inicio == NULL){
-            Inicio = new Nodo(dato,pos_memoria);
+            Inicio = new NodoC(dato,Nodo_memoria);
         } else{
-            Nodo *temp = this->Inicio;
+            NodoC *temp = this->Inicio;
             while(temp->siguiente != NULL) {
                 temp = temp->siguiente;
             }
-            temp->siguiente = new Nodo(dato,pos_memoria);
+            temp->siguiente = new NodoC(dato,Nodo_memoria);
         }
     }
     int tamano(){
-        Nodo* temp = Inicio;
+        NodoC* temp = Inicio;
         int i = 1;
         if (Inicio == NULL) {
             return 0;
@@ -51,12 +62,12 @@ public: Nodo *Inicio = NULL;
         if(tamano() < posicion){
             return;
         }
-        Nodo* temp = Inicio;
+        NodoC* temp = Inicio;
         for (int i = 0; i <= (posicion - 2); i++){
             temp = temp->siguiente;
         }
         if (temp->siguiente != NULL){
-            Nodo* temp2 = temp->siguiente;
+            NodoC* temp2 = temp->siguiente;
             if(temp2->siguiente != NULL){
                 temp->siguiente = temp2->siguiente;
             }else if(temp2->siguiente == NULL){
@@ -70,21 +81,31 @@ public: Nodo *Inicio = NULL;
         if (Inicio == NULL) {
             return;
         }
-        Nodo* temp = Inicio;
+        NodoC* temp = Inicio;
         for (int i = 0; i <= (posicion - 1); i++){
             temp = temp->siguiente;
         }
         temp->Dato = dato;
     }
-    void cambiar_pos_memoria (int posicion, int pos_memo){
+    void cambiar_pos_memoria (int posicion, Nodo* pos_memo){
         if (Inicio == NULL) {
             return;
         }
-        Nodo* temp = Inicio;
+        NodoC* temp = Inicio;
         for (int i = 0; i <= (posicion - 1); i++){
             temp = temp->siguiente;
         }
-        temp->pos_memoria = pos_memo;
+        temp->nodo_memoria = pos_memo;
+    }
+    Nodo* obtener_pos_memoria(int posicion){
+        if (Inicio == NULL) {
+            return NULL;
+        }
+        NodoC* temp = Inicio;
+        for (int i = 0; i <= (posicion - 1); i++){
+            temp = temp->siguiente;
+        }
+        return temp->nodo_memoria;
     }
 
 };
@@ -94,33 +115,46 @@ public: Nodo *Inicio = NULL;
 // False = 0 -> Vacìo
 
 class Colector{
-    Lista lista_Datos;
+public:Lista lista_Datos;
 
 
-    void guardar_dato (int pos_mem){
-        Nodo* temp = lista_Datos.Inicio;
-        int i = 0;
-        while (temp->siguiente != NULL){
+public: Nodo* guardar_dato (int cant_bytes){
+        NodoC* temp = lista_Datos.Inicio;
+        for(int i = 0; i < lista_Datos.tamano();i++){
             if (temp->Dato == 0){
                 lista_Datos.cambiar_Dato(i,1);
-                return;
+                return lista_Datos.obtener_pos_memoria(i);
             }
             temp = temp->siguiente;
-            i++;
         }
-        lista_Datos.anadir_final(1, pos_mem);
+        Nodo *puntero;
+        puntero = (Nodo *)malloc(sizeof(cant_bytes));
+        lista_Datos.anadir_final(1, puntero);
+        return puntero;
+
     }
-    void borrar_dato (int pos_memo){
-        Nodo* temp = lista_Datos.Inicio;
+
+public: void borrar_dato (Nodo* pos_memo){
+        NodoC* temp = lista_Datos.Inicio;
         int i = 0;
         while (temp->siguiente != NULL){
-            if (temp->pos_memoria == pos_memo){
+            if (temp->nodo_memoria == pos_memo){
                 lista_Datos.cambiar_Dato(i,0);
                 return;
             }
             temp = temp->siguiente;
             i++;
         }
+    }
+
+public: void print_lista(){
+        NodoC* temp = lista_Datos.Inicio;
+        for(int i = 0; i < lista_Datos.tamano();i++){
+            std::cout << "---------Entro al for :v---------" << std::endl;
+            std::cout << temp->Dato << " / " << &temp->nodo_memoria << std::endl;
+            temp = temp->siguiente;
+        }
+        return ;
     }
 
 };
@@ -133,24 +167,29 @@ public: Colector colector;
         colector = colecto;
     }
 
-    Nodo* My_New(int dato){
-
+    Nodo* My_New(int dato, int cant_bytes){
+        Nodo* pos = colector.guardar_dato(cant_bytes);
         Nodo* nuevo = new Nodo(dato, NULL);
+        pos = nuevo;
         return nuevo;
+    }
+
+    void My_Delete(int pos_memo){
+
     }
 
     void anadir_final (int dato){
         if(Inicio == NULL){
-            Nodo* niu = My_New(dato);
-            Inicio = niu;
+            Nodo* nuevo = My_New(dato, 8);
+            Inicio = nuevo;
             // Inicio = new Nodo(dato,NULL);
         } else{
             Nodo *temp = this->Inicio;
             while(temp->siguiente != NULL) {
                 temp = temp->siguiente;
             }
-            Nodo* niu = My_New(dato);
-            temp->siguiente = niu;
+            Nodo* nuevo = My_New(dato, 8);
+            temp->siguiente = nuevo;
             //temp->siguiente = new Nodo(dato,NULL);
         }
     }
@@ -231,11 +270,12 @@ public: Colector colector;
         }
         temp->pos_memoria = pos_memo;
     }
-     void print_lista(){
+
+    void print_lista(){
         Nodo* temp = Inicio;
 
         while(temp->siguiente!= NULL){
-        //for (int i = 0; i < ; i++){
+            //for (int i = 0; i < ; i++){
             if (Inicio == NULL) {
                 return ;
             }
@@ -274,25 +314,28 @@ public :PLista* ordenar(PLista* list){
 
 int main() {
 
-
+    std::cout << "------------------" << std::endl;
     // Crear Colector
     Colector colector;
 
 
     // Crear Lista
     PLista* lista = new PLista(colector);
-    for (int i = 0; i < 100; i++){
+    for (int i = 0; i < 10; i++){
+        std::cout <<  colector.lista_Datos.tamano() << std::endl;
         int num = rand() % 100 + 1;
         lista->anadir_final( num );
     }
     insertionSort sort;
     lista = sort.ordenar(lista);
-    std::cout << lista->obtener_dato(10) << std::endl;
-    std::cout << lista->obtener_dato(20) << std::endl;
-    std::cout << lista->obtener_dato(30) << std::endl;
-    std::cout << lista->obtener_dato(40) << std::endl;
-    std::cout << lista->obtener_dato(50) << std::endl;
-    std::cout << lista->obtener_dato(60) << std::endl;
+    lista->print_lista();
+
+    std::cout << "------------------" << std::endl;
+
+    colector.print_lista();
+
+    std::cout << "------------------" << std::endl;
+
     return 0;
 }
 
