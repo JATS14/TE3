@@ -29,13 +29,17 @@ NodoC::NodoC(int dato, Nodo* nodo_mem) {
 }
 
 class Lista {
-public: NodoC *Inicio = NULL;
+public: NodoC *Inicio;
+
+public: Lista(){
+    Inicio = NULL;
+}
 
     void anadir_final (int dato, Nodo* Nodo_memoria){
         if(Inicio == NULL){
             Inicio = new NodoC(dato,Nodo_memoria);
         } else{
-            NodoC *temp = this->Inicio;
+            NodoC *temp = Inicio;
             while(temp->siguiente != NULL) {
                 temp = temp->siguiente;
             }
@@ -115,42 +119,46 @@ public: NodoC *Inicio = NULL;
 // False = 0 -> Vacìo
 
 class Colector{
-public:Lista lista_Datos;
+public:Lista* lista_Datos;
+
+public: Colector(){
+    lista_Datos = new Lista();
+}
 
 
 public: Nodo* guardar_dato (int cant_bytes){
-        NodoC* temp = lista_Datos.Inicio;
-        for(int i = 0; i < lista_Datos.tamano();i++){
+        NodoC* temp = lista_Datos->Inicio;
+        for(int i = 0; i < lista_Datos->tamano();i++){
             if (temp->Dato == 0){
-                lista_Datos.cambiar_Dato(i,1);
-                return lista_Datos.obtener_pos_memoria(i);
+                lista_Datos->cambiar_Dato(i,1);
+                return lista_Datos->obtener_pos_memoria(i);
             }
             temp = temp->siguiente;
         }
         Nodo *puntero;
         puntero = (Nodo *)malloc(sizeof(cant_bytes));
-        lista_Datos.anadir_final(1, puntero);
+        lista_Datos->anadir_final(1, puntero);
         return puntero;
 
     }
 
-public: void borrar_dato (Nodo* pos_memo){
-        NodoC* temp = lista_Datos.Inicio;
+public: void borrar_dato (Nodo* pos_memo, int pos){
+        NodoC* temp = lista_Datos->Inicio;
         int i = 0;
         while (temp->siguiente != NULL){
-            if (temp->nodo_memoria == pos_memo){
-                lista_Datos.cambiar_Dato(i,0);
+            if (&temp->nodo_memoria == &pos_memo){
+                lista_Datos->cambiar_Dato(i,0);
                 return;
             }
             temp = temp->siguiente;
             i++;
         }
+        lista_Datos->cambiar_Dato(pos,0);
     }
 
 public: void print_lista(){
-        NodoC* temp = lista_Datos.Inicio;
-        for(int i = 0; i < lista_Datos.tamano();i++){
-            std::cout << "---------Entro al for :v---------" << std::endl;
+        NodoC* temp = lista_Datos->Inicio;
+        for(int i = 0; i < lista_Datos->tamano();i++){
             std::cout << temp->Dato << " / " << &temp->nodo_memoria << std::endl;
             temp = temp->siguiente;
         }
@@ -174,13 +182,13 @@ public: Colector colector;
         return nuevo;
     }
 
-    void My_Delete(int pos_memo){
-
+    void My_Delete(Nodo* pos_memo, int pos){
+      colector.borrar_dato(pos_memo, pos);
     }
 
     void anadir_final (int dato){
         if(Inicio == NULL){
-            Nodo* nuevo = My_New(dato, 8);
+            Nodo* nuevo = My_New(dato, 4);
             Inicio = nuevo;
             // Inicio = new Nodo(dato,NULL);
         } else{
@@ -188,10 +196,23 @@ public: Colector colector;
             while(temp->siguiente != NULL) {
                 temp = temp->siguiente;
             }
-            Nodo* nuevo = My_New(dato, 8);
+            Nodo* nuevo = My_New(dato, 4);
             temp->siguiente = nuevo;
             //temp->siguiente = new Nodo(dato,NULL);
         }
+    }
+
+    void anadir_Inicio(int dato){
+        if (Inicio == NULL){
+            Nodo* nuevo = My_New(dato, 4);
+            Inicio = nuevo;
+        }else{
+            Nodo* nuevo = My_New(dato, 4);
+            Nodo* temp = Inicio;
+            Inicio = nuevo;
+            nuevo->siguiente = temp;
+        }
+        return;
     }
 
     int obtener_dato(int posicion){
@@ -239,6 +260,7 @@ public: Colector colector;
         for (int i = 0; i <= (posicion - 2); i++){
             temp = temp->siguiente;
         }
+        My_Delete(temp, posicion);
         if (temp->siguiente != NULL){
             Nodo* temp2 = temp->siguiente;
             if(temp2->siguiente != NULL){
@@ -314,28 +336,47 @@ public :PLista* ordenar(PLista* list){
 
 int main() {
 
-    std::cout << "------------------" << std::endl;
+    std::cout << "---------Se inicializa el colector---------" << std::endl;
     // Crear Colector
     Colector colector;
 
 
     // Crear Lista
+    std::cout << "---------Creamos la lista con n elementos---------" << std::endl;
     PLista* lista = new PLista(colector);
     for (int i = 0; i < 10; i++){
-        std::cout <<  colector.lista_Datos.tamano() << std::endl;
         int num = rand() % 100 + 1;
         lista->anadir_final( num );
     }
+    std::cout << "---------Le aplicamos insetion sort a la lista; Lista ordenada: ---------" << std::endl;
     insertionSort sort;
     lista = sort.ordenar(lista);
     lista->print_lista();
 
-    std::cout << "------------------" << std::endl;
+    std::cout << "-------Print de la lista en el colector-----------" << std::endl;
+    std::cout << "-----Como el colector no tenia ningun espacio disponible se crearon n espacios nuevos------" << std::endl;
+    std::cout << "-----entonces todos los los datos de la lista del colector son = 1------" << std::endl;
+
 
     colector.print_lista();
 
-    std::cout << "------------------" << std::endl;
+    std::cout << "--------Borramos en la lista la aposicion 1: Luego se imprimer la lista del colector----------" << std::endl;
+    std::cout << "-------El colector deberia de libera un espacio en memoria-----------" << std::endl;
+    std::cout << "-------uno de los datos del colector ahora es = 0 (espacio libre)-----------" << std::endl;
 
+
+    lista->borrar_Dato(1);
+    colector.print_lista();
+
+    std::cout << "--------ahora se agrega un elemento nuevo a la lista (Al INICIO); se imprime la lista del colector----------" << std::endl;
+    std::cout << "--------Como un espacio del colector estaba libre, este se resicla, ahora el espacio----------" << std::endl;
+    std::cout << "-------------que tenia un 0, es igual a 1; un nuevo dato ocupa ese espacio--------------" << std::endl;
+    lista->anadir_Inicio(1000);
+    colector.print_lista();
+
+    std::cout << "--------Ahora se imprime la lista con los cambios generales----------" << std::endl;
+    lista->print_lista();
+    std::cout << "---------------------------------------------------------------------" << std::endl;
     return 0;
 }
 
