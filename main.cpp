@@ -231,6 +231,19 @@ public: Colector colector;
         }
         temp->pos_memoria = pos_memo;
     }
+     void print_lista(){
+        Nodo* temp = Inicio;
+
+        while(temp->siguiente!= NULL){
+        //for (int i = 0; i < ; i++){
+            if (Inicio == NULL) {
+                return ;
+            }
+            std::cout << temp->Dato << std::endl;
+            temp = temp->siguiente;
+        }
+        return ;
+    }
 
 };
 
