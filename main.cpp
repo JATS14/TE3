@@ -30,11 +30,12 @@ NodoC::NodoC(int dato, Nodo* nodo_mem) {
 
 class Lista {
 public: NodoC *Inicio;
-
 public: Lista(){
-    Inicio = NULL;
-}
-
+        Inicio = NULL;
+    }
+    /// funcion que agrega un elemento al final de la lista
+    /// \param dato elemento que se desea agregar a la lista
+    /// \param Nodo_memoria posicion en memoria del dato
     void anadir_final (int dato, Nodo* Nodo_memoria){
         if(Inicio == NULL){
             Inicio = new NodoC(dato,Nodo_memoria);
@@ -46,6 +47,8 @@ public: Lista(){
             temp->siguiente = new NodoC(dato,Nodo_memoria);
         }
     }
+    /// funcion que muestra la canitad de datos
+    /// \return int con la canitdad de datos de la lista
     int tamano(){
         NodoC* temp = Inicio;
         int i = 1;
@@ -58,7 +61,8 @@ public: Lista(){
         }
         return i;
     }
-
+    /// funcion que permite borrar los datos de una lista
+    /// \param posicion posicion que se desea borrar en la lista
     void borrar_Dato(int posicion){
         if (Inicio == NULL) {
             return;
@@ -80,7 +84,9 @@ public: Lista(){
         }
         return;
     }
-
+    /// funcion que cambia el dato en la posicion indicada por uno nuevo
+    /// \param posicion posicion que se desesa cambiar
+    /// \param dato dato que se va a sustituir
     void cambiar_Dato (int posicion, int dato){
         if (Inicio == NULL) {
             return;
@@ -91,6 +97,9 @@ public: Lista(){
         }
         temp->Dato = dato;
     }
+    /// funcion que cambia la posicion en memoria por otra indicada
+    /// \param posicion posicion que se desea cambiar
+    /// \param pos_memo nueva posicion
     void cambiar_pos_memoria (int posicion, Nodo* pos_memo){
         if (Inicio == NULL) {
             return;
@@ -101,6 +110,9 @@ public: Lista(){
         }
         temp->nodo_memoria = pos_memo;
     }
+    /// funcion que muestra la posicion de memoria del dato indicado
+    /// \param posicion posicion a la que se le desea conocer la direccion
+    /// \return retorna la direccion de memoria de la posicion indica
     Nodo* obtener_pos_memoria(int posicion){
         if (Inicio == NULL) {
             return NULL;
@@ -122,9 +134,8 @@ class Colector{
 public:Lista* lista_Datos;
 
 public: Colector(){
-    lista_Datos = new Lista();
-}
-
+        lista_Datos = new Lista();
+    }
 
 public: Nodo* guardar_dato (int cant_bytes){
         NodoC* temp = lista_Datos->Inicio;
@@ -174,18 +185,24 @@ public: Colector colector;
     PLista(Colector colecto){
         colector = colecto;
     }
-
+    ///
+    /// \param dato dato que se desea agragar a la lista
+    /// \param cant_bytes cantidad de bytes que se le asignan
+    /// \return
     Nodo* My_New(int dato, int cant_bytes){
         Nodo* pos = colector.guardar_dato(cant_bytes);
         Nodo* nuevo = new Nodo(dato, NULL);
         pos = nuevo;
         return nuevo;
     }
-
-    void My_Delete(Nodo* pos_memo, int pos){
-      colector.borrar_dato(pos_memo, pos);
+    /// funcion que libera la memoria del collector
+    /// \param pos_memo posicion de memoria que se libera
+    /// \param accion si es 1 libera la memoria parcialmete y 0 completamente
+    void My_Delete(Nodo* pos_memo, int accion){
+        colector.borrar_dato(pos_memo, accion);
     }
-
+    /// funcion que agrega al final de la lista un elemento
+    /// \param dato dato que se desea agregar
     void anadir_final (int dato){
         if(Inicio == NULL){
             Nodo* nuevo = My_New(dato, 4);
@@ -201,7 +218,8 @@ public: Colector colector;
             //temp->siguiente = new Nodo(dato,NULL);
         }
     }
-
+    /// funcion que agrega al inicio un elemento
+    /// \param dato elemento que se agrega
     void anadir_Inicio(int dato){
         if (Inicio == NULL){
             Nodo* nuevo = My_New(dato, 4);
@@ -214,7 +232,9 @@ public: Colector colector;
         }
         return;
     }
-
+    /// funcion que muestra el dato de la posicion indicada
+    /// \param posicion posicion en la lista del dato que se desea consultar
+    /// \return int con el dato que esta en esa posicion
     int obtener_dato(int posicion){
         if (Inicio == NULL) {
             return NULL;
@@ -225,6 +245,9 @@ public: Colector colector;
         }
         return temp->Dato;
     }
+    /// funcion que retorna la posicion de memoria de un dato indicado
+    /// \param posicion posicion del dato en la lista
+    /// \return posicion de memoria del dato consultado
     int obtener_pos_memoria(int posicion){
         if (Inicio == NULL) {
             return NULL;
@@ -235,7 +258,8 @@ public: Colector colector;
         }
         return temp->pos_memoria;
     }
-
+    /// funcion que muestra la cantidad de datos de una lista
+    /// \return int con la cantidad de datos
     int tamano(){
         Nodo* temp = Inicio;
         int i = 1;
@@ -248,7 +272,8 @@ public: Colector colector;
         }
         return i;
     }
-
+    /// funcion que borra el nodo en la posicion indicada
+    /// \param posicion posicion que se desea eliminar
     void borrar_Dato(int posicion){
         if (Inicio == NULL) {
             return;
@@ -271,7 +296,9 @@ public: Colector colector;
         }
         return;
     }
-
+    /// funcion que cambia el dato en la posicion indicada por uno nuevo
+    /// \param posicion posicion que se desesa cambiar
+    /// \param dato dato que se va a sustituir
     void cambiar_Dato (int posicion, int dato){
         if (Inicio == NULL) {
             return;
@@ -282,17 +309,20 @@ public: Colector colector;
         }
         temp->Dato = dato;
     }
-    void cambiar_pos_memoria (int posicion, int pos_memo){
+    /// funcion que cambia la posicion en memoria por otra indicada
+    /// \param posicion posicion que se desea cambiar
+    /// \param pos_memo nueva posicion
+    void cambiar_pos_memoria (int posicion, int pos_memo) {
         if (Inicio == NULL) {
             return;
         }
-        Nodo* temp = Inicio;
-        for (int i = 0; i <= (posicion - 1); i++){
+        Nodo *temp = Inicio;
+        for (int i = 0; i <= (posicion - 1); i++) {
             temp = temp->siguiente;
         }
         temp->pos_memoria = pos_memo;
     }
-
+    ///funcion imprime la lista
     void print_lista(){
         Nodo* temp = Inicio;
 
@@ -310,7 +340,6 @@ public: Colector colector;
 };
 
 class insertionSort{
-
 public :PLista* ordenar(PLista* list){
         int n = list->tamano();
         for (int i = 0; i < (n-1); i++) {
